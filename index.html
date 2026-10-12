@@ -1,0 +1,582 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Innovacion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Mono:wght@500&family=Instrument+Sans:wght@400..700&family=Sora:wght@300..500&display=swap">
+<style>
+/* Layout: sticky slim header, hero split into headline + glass countdown, 2x2 event grid, separate registration view. Motion is transform/opacity only. */
+:root {
+  --font-display: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --bg: #F3F5FA;
+  --surface: #FFFFFF;
+  --field: #FFFFFF;
+  --ink: #0C1426;
+  --muted: #525E78;
+  --line: #DCE2EE;
+  --line-strong: #B9C3D6;
+  --accent: #2A52E0;
+  --accent-hover: #1F43C2;
+  --accent-ink: #FFFFFF;
+  --danger: #B3261E;
+  --glow-1: rgba(42, 82, 224, .16);
+  --glow-2: rgba(42, 82, 224, .08);
+  --glass-bg: rgba(255, 255, 255, .55);
+  --glass-line: rgba(255, 255, 255, .85);
+  --shadow: rgba(12, 20, 38, .10);
+  --gutter: clamp(16px, 4vw, 40px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A1020; --surface: #121A31; --field: #0E1529; --ink: #E8EEFF; --muted: #98A5C3;
+    --line: #232E4C; --line-strong: #36446A; --accent: #6C8DFF; --accent-hover: #86A2FF; --accent-ink: #0A1020;
+    --danger: #FF8F85; --glow-1: rgba(108, 141, 255, .26); --glow-2: rgba(108, 141, 255, .12);
+    --glass-bg: rgba(24, 34, 64, .5); --glass-line: rgba(255, 255, 255, .14); --shadow: rgba(0, 0, 0, .4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0A1020; --surface: #121A31; --field: #0E1529; --ink: #E8EEFF; --muted: #98A5C3;
+  --line: #232E4C; --line-strong: #36446A; --accent: #6C8DFF; --accent-hover: #86A2FF; --accent-ink: #0A1020;
+  --danger: #FF8F85; --glow-1: rgba(108, 141, 255, .26); --glow-2: rgba(108, 141, 255, .12);
+  --glass-bg: rgba(24, 34, 64, .5); --glass-line: rgba(255, 255, 255, .14); --shadow: rgba(0, 0, 0, .4);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  padding-inline: var(--gutter);
+  padding-block: 0;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.05; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+.wrap { max-width: 72rem; margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* icons */
+.ico { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* buttons: squared corners, quick press feedback */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 46px; padding: .7rem 1.25rem;
+  font: 600 1rem/1 var(--font-body);
+  border: 1.5px solid transparent; border-radius: 6px;
+  cursor: pointer; text-decoration: none;
+  transition: transform .12s ease-out, background-color .15s ease, border-color .15s ease, color .15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); }
+.btn-outline { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.btn-ghost { background: transparent; color: var(--ink); padding-inline: .75rem; min-height: 40px; }
+@media (hover: hover) {
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-ghost:hover { color: var(--accent); }
+}
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:hover { animation: breathe 1.8s ease-in-out infinite; }
+  .btn:active { animation: none; }
+}
+.arrow { width: 1.1em; height: 1.1em; transition: transform .15s ease-out; }
+@media (hover: hover) { .btn:hover .arrow { transform: translateX(3px); } }
+
+/* header */
+.site-header {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+  margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter);
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 60px; }
+.brand { display: inline-flex; align-items: center; gap: .6rem; font: 800 1.2rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; min-height: 44px; }
+.brand svg { width: 28px; height: 28px; color: var(--accent); }
+.bar nav { display: flex; align-items: center; gap: .5rem; }
+.bar .btn-primary { min-height: 40px; padding: .55rem 1rem; font-size: .95rem; }
+
+/* hero */
+.hero { position: relative; isolation: isolate; padding-block: clamp(2rem, 7vw, 4.5rem) clamp(2.5rem, 7vw, 5rem); }
+.hero::before {
+  content: ""; position: absolute; z-index: -2; inset: 0 calc(var(--gutter) * -1);
+  background:
+    radial-gradient(60% 70% at 85% 25%, var(--glow-1), transparent 70%),
+    radial-gradient(50% 60% at 5% 95%, var(--glow-2), transparent 70%);
+}
+.ring-pos { position: absolute; z-index: -1; pointer-events: none; right: -9rem; bottom: -7rem; width: min(30rem, 110vw); aspect-ratio: 1; }
+.ring { width: 100%; height: 100%; color: var(--accent); opacity: .4; stroke-width: .28; animation: spin 80s linear infinite; will-change: transform; }
+.hero-grid { display: grid; gap: 2rem; align-items: center; }
+.eyebrow { display: inline-flex; align-items: center; gap: .6rem; font: 500 .8rem/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.eyebrow::before { content: ""; width: 1.4rem; height: 2px; background: var(--accent); }
+.hero h1 { font-size: clamp(3rem, 14vw, 6rem); font-weight: 800; letter-spacing: -.035em; margin-block: .9rem 1rem; }
+.lead { max-width: 34rem; font-size: clamp(1.05rem, 2.6vw, 1.2rem); color: var(--muted); }
+.venue-badge { display: inline-flex; align-items: center; gap: .55rem; margin-top: 1.25rem; padding: .5rem .9rem .5rem .7rem; font: 500 .85rem/1.2 var(--font-mono); letter-spacing: .1em; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-left: 3px solid var(--accent); border-radius: 6px; }
+.venue-badge { min-height: 44px; }
+.venue-badge svg { width: 18px; height: 18px; flex: none; color: var(--accent); }
+.venue-badge .arrow { width: 16px; height: 16px; }
+.cta-row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.75rem; }
+.organizer { max-width: 30rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .92rem; color: var(--muted); }
+.venue { display: flex; align-items: center; gap: .45rem; margin-top: .4rem; color: var(--ink); font-weight: 600; }
+.venue svg { width: 18px; height: 18px; flex: none; color: var(--accent); }
+
+/* liquid glass countdown (the one place blur is used) */
+.glass {
+  position: relative; padding: 1.25rem clamp(1rem, 3vw, 1.75rem) 1.4rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-line); border-radius: 14px;
+  -webkit-backdrop-filter: blur(14px) saturate(150%); backdrop-filter: blur(14px) saturate(150%);
+  box-shadow: 0 14px 34px var(--shadow), inset 0 1px 0 var(--glass-line);
+  overflow: hidden;
+}
+.glass::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,255,255,0) 38%); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .glass { background: var(--surface); } }
+.glass > * { position: relative; }
+.glass { container-type: inline-size; container-name: cd; }
+.cd-label { font: 500 .8rem/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cd-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; margin-top: .9rem; }
+.cd-cell { display: grid; justify-items: center; gap: .3rem; padding-block: .75rem .6rem; background: var(--glass-bg); border: 1px solid var(--line); border-radius: 8px; }
+.cd-num { display: block; font: 300 clamp(1.6rem, 6.4vw, 2.7rem)/1 "Sora", var(--font-body); font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
+.cd-num.tick { animation: tick .22s ease-out; }
+.cd-unit { font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.cd-foot { margin-top: .9rem; font-size: .95rem; color: var(--muted); }
+.cd-status { margin-top: .9rem; font: 700 1.4rem/1.2 var(--font-display); }
+/* counter contents scale with the glass box, so they follow its width in any orientation */
+@supports (width: 1cqi) {
+  .cd-num { font-size: min(15cqi, 16vh); }
+  .cd-unit { font-size: clamp(.6rem, 3.6cqi, .8rem); }
+  .cd-label { font-size: clamp(.68rem, 3.6cqi, .85rem); }
+  .cd-grid { gap: 2.4cqi; margin-top: 4cqi; }
+  .cd-cell { padding-block: 4cqi 3cqi; gap: 1.6cqi; }
+  .cd-status { font-size: clamp(1.1rem, 7cqi, 1.6rem); }
+}
+
+/* events */
+.section { padding-block: clamp(2.5rem, 7vw, 4.5rem); scroll-margin-top: 4.5rem; }
+.section-head { display: grid; gap: .75rem; max-width: 36rem; margin-bottom: 2rem; }
+.section-head h2 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; letter-spacing: -.03em; }
+.section-head p { color: var(--muted); }
+.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); }
+.card { display: flex; flex-direction: column; gap: .8rem; min-width: 0; padding: 1.4rem; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; transition: transform .18s ease-out, border-color .18s ease-out; }
+.card .ico-wrap { display: grid; place-items: center; width: 52px; height: 52px; border: 1px solid var(--line-strong); border-radius: 8px; color: var(--accent); }
+.card .ico-wrap svg { width: 32px; height: 32px; }
+.tag { font: 500 .75rem/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.card h3 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.02em; }
+.card p { color: var(--muted); }
+.card .btn { margin-top: auto; align-self: flex-start; }
+.card p + .btn { margin-top: .6rem; }
+@media (hover: hover) {
+  .card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .card:hover .spin-on-hover { transform: rotate(60deg); }
+}
+.spin-on-hover { transition: transform .5s ease-out; }
+
+/* footer */
+.site-footer { margin-inline: calc(var(--gutter) * -1); padding: 1.5rem var(--gutter) 2rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+.site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem 1.5rem; }
+
+/* registration */
+.reg { padding-block: clamp(1.5rem, 5vw, 3.5rem) 3rem; display: grid; gap: 1.5rem; max-width: 34rem; margin-inline: auto; }
+.reg h1 { font-size: clamp(2.2rem, 8vw, 3.2rem); font-weight: 800; letter-spacing: -.03em; margin-top: .6rem; }
+.reg-ctx { margin-top: .6rem; color: var(--muted); }
+.reg-ctx strong { color: var(--ink); }
+.panel { padding: clamp(1.1rem, 4vw, 1.75rem); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; animation: rise .35s ease-out; }
+.field { display: grid; gap: .4rem; margin-bottom: 1.1rem; }
+.field label { font-weight: 600; font-size: .92rem; }
+.field input, .field select {
+  width: 100%; min-height: 48px; padding: .7rem .85rem;
+  font: inherit; font-size: 1rem; color: var(--ink); background: var(--field);
+  border: 1.5px solid var(--line-strong); border-radius: 6px;
+  -webkit-appearance: none; appearance: none;
+}
+.field input::placeholder { color: var(--muted); opacity: .75; }
+.field input[aria-invalid="true"], .field select[aria-invalid="true"] { border-color: var(--danger); }
+.select-wrap { position: relative; }
+.select-wrap select { padding-right: 2.6rem; }
+.select-wrap::after { content: ""; position: absolute; right: 1.05rem; top: 50%; width: .55rem; height: .55rem; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.err { min-height: 1.2em; font-size: .85rem; color: var(--danger); }
+.form-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: .4rem; }
+.form-actions .btn-primary { flex: 1 1 12rem; }
+.summary { display: grid; gap: .6rem; margin: 1.1rem 0 1.5rem; padding: 0; }
+.summary div { display: grid; grid-template-columns: 8.5rem minmax(0, 1fr); gap: .75rem; padding-bottom: .6rem; border-bottom: 1px solid var(--line); }
+.summary dt { color: var(--muted); font-size: .9rem; }
+.summary dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.done h2 { font-size: clamp(1.8rem, 6vw, 2.4rem); font-weight: 800; letter-spacing: -.02em; }
+.done p { margin-top: .5rem; color: var(--muted); }
+
+/* motion */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes tick { from { opacity: .25; transform: translateY(-30%); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.hero-copy > * { animation: rise .45s cubic-bezier(.2, .7, .2, 1) both; }
+.hero-copy > :nth-child(2) { animation-delay: .05s; }
+.hero-copy > :nth-child(3) { animation-delay: .1s; }
+.hero-copy > :nth-child(4) { animation-delay: .15s; }
+.hero .glass { animation: rise .5s .12s cubic-bezier(.2, .7, .2, 1) both; }
+
+/* two-column hero: tablets, desktops and landscape phones */
+@media (min-width: 760px), (min-width: 560px) and (orientation: landscape) {
+  .hero-grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(1.5rem, 4vw, 3.5rem); }
+  .hero h1 { font-size: clamp(2.6rem, 8vw, 5.5rem); }
+  .ring-pos { right: -6rem; top: 50%; bottom: auto; transform: translateY(-50%); width: min(34rem, 70vw); }
+}
+/* short landscape screens */
+@media (max-height: 520px) and (orientation: landscape) {
+  .site-header { position: static; }
+  .hero { padding-block: 1.25rem 1.75rem; }
+  .hero h1 { font-size: clamp(2.2rem, 13vh, 4rem); margin-block: .5rem; }
+  .lead { font-size: 1rem; }
+  .cta-row { margin-top: 1rem; }
+  .section { padding-block: 2rem; }
+  .reg { padding-block: 1rem 2rem; }
+}
+@media (max-width: 380px) {
+  .summary div { grid-template-columns: 1fr; gap: .15rem; }
+  .bar .btn-ghost { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-aperture" viewBox="0 0 48 48">
+    <circle cx="24" cy="24" r="20"/>
+    <polygon points="24,16 30.93,20 30.93,28 24,32 17.07,28 17.07,20"/>
+    <line x1="24" y1="16" x2="41.32" y2="14"/>
+    <line x1="24" y1="16" x2="41.32" y2="14" transform="rotate(60 24 24)"/>
+    <line x1="24" y1="16" x2="41.32" y2="14" transform="rotate(120 24 24)"/>
+    <line x1="24" y1="16" x2="41.32" y2="14" transform="rotate(180 24 24)"/>
+    <line x1="24" y1="16" x2="41.32" y2="14" transform="rotate(240 24 24)"/>
+    <line x1="24" y1="16" x2="41.32" y2="14" transform="rotate(300 24 24)"/>
+  </symbol>
+  <symbol id="i-robot" viewBox="0 0 48 48">
+    <rect x="10" y="15" width="28" height="22" rx="4"/>
+    <line x1="24" y1="15" x2="24" y2="9"/>
+    <circle cx="24" cy="7.5" r="1.8"/>
+    <circle cx="18" cy="25" r="2.6"/>
+    <circle cx="30" cy="25" r="2.6"/>
+    <line x1="18" y1="32" x2="30" y2="32"/>
+    <line x1="6" y1="23" x2="6" y2="29"/>
+    <line x1="42" y1="23" x2="42" y2="29"/>
+  </symbol>
+  <symbol id="i-compass" viewBox="0 0 48 48">
+    <circle cx="24" cy="24" r="18"/>
+    <polygon points="31,17 27,27 17,31 21,21"/>
+    <circle cx="24" cy="24" r="1.4"/>
+    <line x1="24" y1="6" x2="24" y2="9"/>
+    <line x1="24" y1="39" x2="24" y2="42"/>
+    <line x1="6" y1="24" x2="9" y2="24"/>
+    <line x1="39" y1="24" x2="42" y2="24"/>
+  </symbol>
+  <symbol id="i-frames" viewBox="0 0 48 48">
+    <rect x="6" y="11" width="36" height="26" rx="3"/>
+    <polygon points="20,18 20,30 30,24"/>
+    <line x1="11" y1="15" x2="11" y2="17"/>
+    <line x1="11" y1="31" x2="11" y2="33"/>
+    <line x1="37" y1="15" x2="37" y2="17"/>
+    <line x1="37" y1="31" x2="37" y2="33"/>
+  </symbol>
+  <symbol id="i-pin" viewBox="0 0 48 48">
+    <path d="M24 43C24 43 10 30 10 20a14 14 0 0 1 28 0C38 30 24 43 24 43Z"/>
+    <circle cx="24" cy="20" r="5"/>
+  </symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24">
+    <line x1="4" y1="12" x2="19" y2="12"/>
+    <polyline points="13,6 19,12 13,18"/>
+  </symbol>
+</svg>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <button type="button" class="brand" data-go="home" aria-label="Innovacion home">
+      <svg class="ico" aria-hidden="true"><use href="#i-aperture"/></svg>
+      Innovacion
+    </button>
+    <nav aria-label="Primary">
+      <button type="button" class="btn btn-ghost" data-go="events">Events</button>
+      <button type="button" class="btn btn-primary" data-go="register">Register</button>
+    </nav>
+  </div>
+</header>
+
+<main id="v-home" class="wrap">
+  <section class="hero" aria-labelledby="title">
+    <div class="ring-pos" aria-hidden="true"><svg class="ring ico" viewBox="0 0 48 48"><use href="#i-aperture"/></svg></div>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">Technical fest &middot; Sunday, 25 October 2026</p>
+        <h1 id="title">Innovacion</h1>
+        <p class="lead">One day of building, competing and exploring. Four events, open to every department. Pick yours and register in under a minute.</p>
+        <div class="venue-badge"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><span>GODREJ GENESIS BUILDING</span></div>
+        <div class="cta-row">
+          <button type="button" class="btn btn-primary" data-go="register">Register now
+            <svg class="ico arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </button>
+          <button type="button" class="btn btn-outline" data-go="events">View events</button>
+        </div>
+        <p class="organizer">By Department of Artificial Intelligence and Machine Learning</p>
+      </div>
+
+      <div class="glass" role="timer" aria-label="Countdown to Innovacion on 25 October 2026">
+        <p class="cd-label" id="cd-label">Event starts in</p>
+        <div class="cd-grid" id="cd-grid">
+          <div class="cd-cell"><span class="cd-num" id="cd-d">00</span><span class="cd-unit">Days</span></div>
+          <div class="cd-cell"><span class="cd-num" id="cd-h">00</span><span class="cd-unit">Hours</span></div>
+          <div class="cd-cell"><span class="cd-num" id="cd-m">00</span><span class="cd-unit">Mins</span></div>
+          <div class="cd-cell"><span class="cd-num" id="cd-s">00</span><span class="cd-unit">Secs</span></div>
+        </div>
+        <p class="cd-status" id="cd-status" hidden></p>
+        <div class="cd-foot">
+          <span>25 October 2026</span>
+          <p class="venue"><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>Godrej Genesis Building</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="events" aria-labelledby="events-title">
+    <div class="section-head">
+      <p class="eyebrow">What's on</p>
+      <h2 id="events-title">Four events</h2>
+      <p>From cameras to combat robots, there is something for every kind of builder. Choose the one that suits you and sign up.</p>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <div class="ico-wrap"><svg class="ico spin-on-hover" aria-hidden="true"><use href="#i-aperture"/></svg></div>
+        <p class="tag">Photography</p>
+        <h3>Aperture</h3>
+        <p>A photography contest built around a theme revealed on the day. Shoot, select your strongest frames and let the judges decide whose lens told the story best.</p>
+        <button type="button" class="btn btn-outline" data-go="register" data-event="Aperture" aria-label="Register for Aperture">Register
+          <svg class="ico arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico-wrap"><svg class="ico" aria-hidden="true"><use href="#i-robot"/></svg></div>
+        <p class="tag">Robotics</p>
+        <h3>Robo Cage</h3>
+        <p>Build a robot and send it into the arena. Teams face off in a caged ring where strength, control and smart design decide who is left standing.</p>
+        <button type="button" class="btn btn-outline" data-go="register" data-event="Robo Cage" aria-label="Register for Robo Cage">Register
+          <svg class="ico arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico-wrap"><svg class="ico" aria-hidden="true"><use href="#i-compass"/></svg></div>
+        <p class="tag">Team puzzle hunt</p>
+        <h3>Treasure Hunt</h3>
+        <p>Follow a trail of riddles and clues across the venue. Think fast, work as a team and be the first to crack the final clue.</p>
+        <button type="button" class="btn btn-outline" data-go="register" data-event="Treasure Hunt" aria-label="Register for Treasure Hunt">Register
+          <svg class="ico arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+      <article class="card">
+        <div class="ico-wrap"><svg class="ico" aria-hidden="true"><use href="#i-frames"/></svg></div>
+        <p class="tag">Animation</p>
+        <h3>Animatrix</h3>
+        <p>An animation contest for storytellers and designers. Turn a short idea into moving frames and show how character and motion can carry a story.</p>
+        <button type="button" class="btn btn-outline" data-go="register" data-event="Animatrix" aria-label="Register for Animatrix">Register
+          <svg class="ico arrow" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+      </article>
+    </div>
+  </section>
+</main>
+
+<main id="v-register" class="wrap" hidden>
+  <div class="reg">
+    <div>
+      <button type="button" class="btn btn-ghost" data-go="home" style="padding-left:0">&larr; Back to Innovacion</button>
+      <h1>Register</h1>
+      <p class="reg-ctx">Registering for <strong id="reg-event">Innovacion 2026</strong> &middot; 25 October 2026 &middot; Godrej Genesis Building</p>
+    </div>
+
+    <form id="reg-form" class="panel" novalidate>
+      <div class="field">
+        <label for="f-name">Full name</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" placeholder="e.g. Ananya Sen" maxlength="60" required>
+        <p class="err" id="e-name" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="f-enroll">Enrollment number</label>
+        <input id="f-enroll" name="enrollment" type="text" autocomplete="off" autocapitalize="characters" placeholder="e.g. 12345678" maxlength="20" required>
+        <p class="err" id="e-enroll" aria-live="polite"></p>
+      </div>
+      <div class="field">
+        <label for="f-dept">Department</label>
+        <div class="select-wrap">
+          <select id="f-dept" name="department" required>
+            <option value="" selected disabled>Select your department</option>
+            <option value="CSE">CSE</option>
+            <option value="AIML">AIML</option>
+            <option value="ECE">ECE</option>
+            <option value="ME">ME</option>
+            <option value="EEE">EEE</option>
+          </select>
+        </div>
+        <p class="err" id="e-dept" aria-live="polite"></p>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Submit registration</button>
+        <button type="button" class="btn btn-outline" data-go="home">Cancel</button>
+      </div>
+    </form>
+
+    <section id="reg-done" class="panel done" hidden aria-live="polite">
+      <h2>Details submitted</h2>
+      <p>Thanks, <span id="d-greet"></span>. Here is what you entered.</p>
+      <dl class="summary">
+        <div><dt>Name</dt><dd id="d-name"></dd></div>
+        <div><dt>Enrollment no.</dt><dd id="d-enroll"></dd></div>
+        <div><dt>Department</dt><dd id="d-dept"></dd></div>
+        <div><dt>Event</dt><dd id="d-event"></dd></div>
+      </dl>
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" data-go="home">Back to home</button>
+        <button type="button" class="btn btn-outline" id="again">Register another</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Innovacion 2026</span>
+    <span>Godrej Genesis Building &middot; Sunday, 25 October 2026</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var home = $('#v-home'), reg = $('#v-register');
+  var chosen = '';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- views ---------- */
+  function show(name) {
+    home.hidden = name !== 'home';
+    reg.hidden = name !== 'register';
+    if (name === 'register') {
+      $('#reg-event').textContent = chosen || 'Innovacion 2026';
+      $('#reg-form').hidden = false;
+      $('#reg-done').hidden = true;
+    }
+    window.scrollTo(0, 0);
+  }
+  function go(name) {
+    show(name);
+    try { if (location.hash !== '#' + name) location.hash = name; } catch (e) {}
+  }
+  function toEvents() {
+    if (home.hidden) go('home');
+    requestAnimationFrame(function () {
+      var el = $('#events');
+      try { el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }
+      catch (e) { el.scrollIntoView(); }
+    });
+  }
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest ? ev.target.closest('[data-go]') : null;
+    if (!b) return;
+    var t = b.getAttribute('data-go');
+    if (t === 'events') { toEvents(); return; }
+    if (t === 'register') chosen = b.getAttribute('data-event') || '';
+    go(t);
+  });
+  window.addEventListener('hashchange', function () {
+    show(location.hash === '#register' ? 'register' : 'home');
+  });
+  if (location.hash === '#register') show('register');
+
+  /* ---------- countdown ---------- */
+  var TARGET = new Date(2026, 9, 25, 0, 0, 0).getTime();
+  var END = TARGET + 864e5;
+  var cell = { d: $('#cd-d'), h: $('#cd-h'), m: $('#cd-m'), s: $('#cd-s') };
+  var last = { d: '', h: '', m: '', s: '' };
+  var timer = 0;
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function set(k, v) {
+    if (last[k] === v) return;
+    last[k] = v;
+    cell[k].textContent = v;
+    if (k === 's' && !reduce) {
+      cell.s.classList.remove('tick');
+      void cell.s.offsetWidth;
+      cell.s.classList.add('tick');
+    }
+  }
+  function tick() {
+    clearTimeout(timer);
+    var now = Date.now();
+    if (now < TARGET) {
+      var t = Math.floor((TARGET - now) / 1000);
+      set('d', pad(Math.floor(t / 86400)));
+      set('h', pad(Math.floor(t % 86400 / 3600)));
+      set('m', pad(Math.floor(t % 3600 / 60)));
+      set('s', pad(t % 60));
+      timer = setTimeout(tick, 1000 - (Date.now() % 1000) + 5);
+    } else {
+      $('#cd-grid').hidden = true;
+      $('#cd-label').textContent = now < END ? 'Happening now' : 'Event update';
+      var st = $('#cd-status');
+      st.hidden = false;
+      st.textContent = now < END ? 'Innovacion is on today. See you there.' : 'Innovacion 2026 has wrapped up. Thanks for coming.';
+      if (now < END) timer = setTimeout(tick, 60000);
+    }
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
+  tick();
+
+  /* ---------- registration form ---------- */
+  var form = $('#reg-form');
+  var f = { name: $('#f-name'), enroll: $('#f-enroll'), dept: $('#f-dept') };
+  var e = { name: $('#e-name'), enroll: $('#e-enroll'), dept: $('#e-dept') };
+  var NAME_RE = /^[\p{L}][\p{L} .'\-]{1,59}$/u;
+  var ENR_RE = /^[A-Za-z0-9][A-Za-z0-9\/\-]{3,19}$/;
+
+  function flag(k, msg) {
+    e[k].textContent = msg;
+    if (msg) f[k].setAttribute('aria-invalid', 'true'); else f[k].removeAttribute('aria-invalid');
+    return !msg;
+  }
+  function validate() {
+    var okName = flag('name', NAME_RE.test(f.name.value.trim()) ? '' : 'Enter your full name using letters only.');
+    var okEnr = flag('enroll', ENR_RE.test(f.enroll.value.trim()) ? '' : 'Enter 4 to 20 letters or digits.');
+    var okDept = flag('dept', f.dept.value ? '' : 'Choose your department from the list.');
+    return { ok: okName && okEnr && okDept, first: !okName ? f.name : !okEnr ? f.enroll : f.dept };
+  }
+  ['name', 'enroll', 'dept'].forEach(function (k) {
+    f[k].addEventListener('input', function () { if (e[k].textContent) flag(k, ''); });
+    f[k].addEventListener('change', function () { if (e[k].textContent) flag(k, ''); });
+  });
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var r = validate();
+    if (!r.ok) { r.first.focus(); return; }
+    var name = f.name.value.trim();
+    $('#d-greet').textContent = name.split(/\s+/)[0];
+    $('#d-name').textContent = name;
+    $('#d-enroll').textContent = f.enroll.value.trim().toUpperCase();
+    $('#d-dept').textContent = f.dept.value;
+    $('#d-event').textContent = chosen || 'Innovacion 2026 (general)';
+    form.hidden = true;
+    $('#reg-done').hidden = false;
+    window.scrollTo(0, 0);
+  });
+  $('#again').addEventListener('click', function () {
+    form.reset();
+    ['name', 'enroll', 'dept'].forEach(function (k) { flag(k, ''); });
+    form.hidden = false;
+    $('#reg-done').hidden = true;
+    f.name.focus();
+  });
+})();
+</script>
+
+</body></html>
